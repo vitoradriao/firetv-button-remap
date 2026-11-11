@@ -1,0 +1,4 @@
+sdk/
+out/
+# Your signing key: keep it to install updates over the same app, never publish it.
+*.keystore
