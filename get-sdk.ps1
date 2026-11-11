@@ -17,7 +17,9 @@ foreach ($p in $parts) {
     $file, $sha1, $inner, $dest = $p
     if (Test-Path "$sdk\$dest") { Write-Host "Ja existe: sdk\$dest"; continue }
     Write-Host "Baixando $file..."
-    Invoke-WebRequest "$base/$file" -OutFile "$tmp\$file" -UseBasicParsing
+    # curl.exe ships with Windows 10/11; Invoke-WebRequest can stall on large files.
+    & curl.exe -fsSL -o "$tmp\$file" "$base/$file"
+    if ($LASTEXITCODE) { throw "Falha ao baixar $file (curl $LASTEXITCODE)." }
     $got = (Get-FileHash "$tmp\$file" -Algorithm SHA1).Hash.ToLower()
     if ($got -ne $sha1) { throw "Checksum errado em $file (esperado $sha1, veio $got)" }
     Expand-Archive "$tmp\$file" "$tmp\x" -Force
